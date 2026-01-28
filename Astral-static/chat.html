@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6a5cff">
+  <title>Astral Chat</title>
+  <!-- Refined chat CSS -->
+  <link rel="stylesheet" href="styles/index.css">
+  <link rel="stylesheet" href="styles/response-style.css">
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="head">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" data-tooltip="Toggle sidebar">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="logo-wrap">
+        <img class ="ai-logo" src="img/logo.jpg">
+      </div>
+    <h3 class = "">ASTRAL</h3>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="chat-sidebar">
+    <button class="new-chat-btn" data-tooltip="Start a new conversation">
+      <span class="btn-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="btn-label">New Chat</span>
+    </button>
+    <div class="chat-history-list js-chat-history-list"></div>
+  </aside>
+
+  <!-- CHAT DISPLAY -->
+  <main>
+    <div class="chat-display-container js-chat-display-container"></div>
+  </main>
+
+  <!-- INPUT / ACTIONS -->
+  <div class="chat-initiate-response">
+    <input 
+      placeholder="Ask me anything..." 
+      class="chat-response js-chat-response" 
+      id="user-input"
+    >
+    <button class="chat-answer-button js-chat-answer-button" aria-label="Send message" data-tooltip="Send message">
+      <span class="btn-icon send-arrow">
+        <!-- Up arrow (send) -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M12 4 L12 20 M5 11 L12 4 L19 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </span>
+      <span class="btn-icon send-stop" aria-hidden="true">
+        <!-- Plain square stop -->
+        <svg class="stop-square" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+      </span>
+      <span class="btn-label">Send</span>
+    </button>
+    
+    <!-- Desktop buttons -->
+    <div class="desktop-buttons">
+      <button class="voice-toggle" aria-pressed="true" data-tooltip="Toggle AI voice responses">
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M11 5 L6 9 H3 v6 h3 l5 4 z" fill="currentColor"/><path d="M16 8a4 4 0 0 1 0 8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="btn-label">Voice : ON</span>
+      </button>
+      <button class="speech-toggle" aria-pressed="false" data-tooltip="Enable speech recognition">
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="9" y="3" width="6" height="12" rx="3" fill="currentColor"/><path d="M12 19v3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 22h8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="btn-label">Speech : OFF</span>
+      </button>
+    </div>
+    
+    <!-- Mobile menu button -->
+    <button class="mobile-menu-toggle" aria-label="More options" data-tooltip="More options">
+      <span class="btn-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="6" r="2" fill="currentColor"/>
+          <circle cx="12" cy="12" r="2" fill="currentColor"/>
+          <circle cx="12" cy="18" r="2" fill="currentColor"/>
+        </svg>
+      </span>
+    </button>
+    
+    <!-- Mobile dropdown menu -->
+    <div class="mobile-dropdown-menu">
+      <button class="voice-toggle" aria-pressed="true" data-tooltip="Toggle AI voice responses">
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M11 5 L6 9 H3 v6 h3 l5 4 z" fill="currentColor"/><path d="M16 8a4 4 0 0 1 0 8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="btn-label">✓ Voice</span>
+      </button>
+      <button class="speech-toggle" aria-pressed="false" data-tooltip="Enable speech recognition">
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="9" y="3" width="6" height="12" rx="3" fill="currentColor"/><path d="M12 19v3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 22h8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="btn-label">Speech</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script type="module" src="scripts/brain.js"></script>
+</body>
+</html>
+
+
