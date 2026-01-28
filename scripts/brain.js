@@ -1,5 +1,21 @@
 let voiceEnabled = false;
 
+// Generate unique user ID for per-user memory
+let userId = null;
+function getUserId() {
+  if (!userId) {
+    const stored = localStorage.getItem('astral_user_id');
+    if (stored) {
+      userId = stored;
+    } else {
+      userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('astral_user_id', userId);
+    }
+  }
+  return userId;
+}
+getUserId(); // Initialize on load
+
 const voiceToggleBtns = document.querySelectorAll('.voice-toggle');
 const speechToggleBtns = document.querySelectorAll('.speech-toggle');
 const runBtn = document.querySelector('.js-chat-answer-button');
@@ -389,7 +405,7 @@ async function handleSend() {
     const resp = await fetch(`https://astral-1-sb1i.onrender.com/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, user_id: getUserId() }),
       signal: controller.signal,
     });
 
