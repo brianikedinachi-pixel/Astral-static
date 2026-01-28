@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6a5cff">
+    <title>Welcome to Astral - Your AI Companion for Support & Guidance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 50%, #0a0f1c 100%);
+            color: #e6f2ff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 2rem;
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00eaff, #8a2be2, #ff6b6b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(0, 234, 255, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 30px rgba(0, 234, 255, 0.3); }
+            to { text-shadow: 0 0 40px rgba(0, 234, 255, 0.6), 0 0 60px rgba(138, 43, 226, 0.4); }
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: #8fd6ff;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #c8e6ff;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: rgba(0, 234, 255, 0.1);
+            border: 1px solid rgba(0, 234, 255, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 234, 255, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00eaff;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            color: #a8d8ff;
+            font-size: 0.95rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #00eaff, #8a2be2);
+            color: #041018;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 234, 255, 0.3);
+            margin-top: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 15px rgba(0, 234, 255, 0.3); }
+            50% { box-shadow: 0 4px 20px rgba(0, 234, 255, 0.5); }
+            100% { box-shadow: 0 4px 15px rgba(0, 234, 255, 0.3); }
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 234, 255, 0.5);
+        }
+
+        .footer {
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            color: #6b8ca8;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #00eaff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        .star:nth-child(1) { width: 2px; height: 2px; top: 10%; left: 20%; animation-delay: 0s; }
+        .star:nth-child(2) { width: 1px; height: 1px; top: 20%; left: 80%; animation-delay: 1s; }
+        .star:nth-child(3) { width: 3px; height: 3px; top: 30%; left: 40%; animation-delay: 2s; }
+        .star:nth-child(4) { width: 1px; height: 1px; top: 50%; left: 10%; animation-delay: 0.5s; }
+        .star:nth-child(5) { width: 2px; height: 2px; top: 70%; left: 90%; animation-delay: 1.5s; }
+        .star:nth-child(6) { width: 1px; height: 1px; top: 80%; left: 60%; animation-delay: 2.5s; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Tablet Styles */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .container {
+                padding: 1.5rem;
+                max-width: 700px;
+            }
+
+            .logo {
+                font-size: 3.5rem;
+            }
+
+            .features {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .feature-card {
+                padding: 1.2rem;
+            }
+        }
+
+        /* Small Tablet Styles */
+        @media (max-width: 768px) and (min-width: 601px) {
+            .container {
+                padding: 1rem;
+                max-width: 600px;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            .tagline {
+                font-size: 1.1rem;
+            }
+
+            .description {
+                font-size: 1rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .feature-card {
+                padding: 1.2rem;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Large Phone Styles */
+        @media (max-width: 600px) and (min-width: 481px) {
+            .container {
+                padding: 1rem;
+                max-width: 90vw;
+            }
+
+            .logo {
+                font-size: 2.5rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .description {
+                font-size: 1rem;
+                line-height: 1.5;
+                margin-bottom: 1.5rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 1.5rem 0;
+            }
+
+            .feature-card {
+                padding: 1rem;
+            }
+
+            .feature-icon {
+                font-size: 1.8rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .feature-desc {
+                font-size: 0.9rem;
+            }
+
+            .cta-button {
+                padding: 0.9rem 1.8rem;
+                font-size: 1.1rem;
+                margin-top: 1.5rem;
+            }
+
+            .footer {
+                margin-top: 2rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Small Phone Styles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.8rem;
+                max-width: 95vw;
+            }
+
+            .logo {
+                font-size: 2.2rem;
+                margin-bottom: 0.7rem;
+            }
+
+            .tagline {
+                font-size: 0.95rem;
+                margin-bottom: 1.2rem;
+            }
+
+            .description {
+                font-size: 0.95rem;
+                line-height: 1.5;
+                margin-bottom: 1.2rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+                margin: 1.2rem 0;
+            }
+
+            .feature-card {
+                padding: 0.9rem;
+            }
+
+            .feature-icon {
+                font-size: 1.6rem;
+                margin-bottom: 0.7rem;
+            }
+
+            .feature-title {
+                font-size: 1rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .feature-desc {
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+                margin-top: 1.2rem;
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .footer {
+                margin-top: 1.5rem;
+                font-size: 0.8rem;
+            }
+
+            .stars .star {
+                display: none;
+            }
+
+            .star:nth-child(1),
+            .star:nth-child(3),
+            .star:nth-child(5) {
+                display: block;
+            }
+        }
+
+        /* Extra Small Phone Styles */
+        @media (max-width: 360px) {
+            .container {
+                padding: 0.6rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 0.9rem;
+            }
+
+            .description {
+                font-size: 0.9rem;
+            }
+
+            .feature-card {
+                padding: 0.8rem;
+            }
+
+            .cta-button {
+                padding: 0.7rem 1.3rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+
+    <div class="container">
+        <h1 class="logo">Astral</h1>
+        <p class="tagline">Your AI Companion for Support, Guidance & Growth</p>
+
+        <p class="description">
+            Astral is an AI assistant dedicated to helping you navigate life's challenges with compassion,
+            understanding, and practical solutions. Whether you're seeking support for personal struggles,
+            emotional guidance, or help with everyday problems, Astral is here to listen and assist.
+        </p>
+
+        <div class="features">
+            <div class="feature-card">
+                <span class="feature-icon">🌟</span>
+                <h3 class="feature-title">Addiction Support</h3>
+                <p class="feature-desc">
+                    Specialized guidance for recovery from substances, gaming, social media, and other addictive behaviors.
+                    Get compassionate support without judgment.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">💙</span>
+                <h3 class="feature-title">Emotional Guidance</h3>
+                <p class="feature-desc">
+                    Navigate emotions, build mental resilience, and develop healthy coping strategies.
+                    You're never alone in your journey.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🧠</span>
+                <h3 class="feature-title">Problem Solving</h3>
+                <p class="feature-desc">
+                    Get help with math, coding, schoolwork, relationships, and life decisions.
+                    Practical solutions with a supportive approach.
+                </p>
+            </div>
+        </div>
+
+        <a href="chat.html" class="cta-button">
+            Chat with Astral Now
+        </a>
+
+        <div class="footer">
+            <p>Created by Nweze-Ukanwoko Brian Chiemerie</p>
+            <p>Built with care for those who need support</p>
+        </div>
+    </div>
+</body>
+</html></content>
+
+
