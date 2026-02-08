@@ -330,7 +330,7 @@ function renderHtmlResult() {
 /* =========================
    TYPING EFFECT
 ========================= */
-function typeText(element, text, speed = 70, onComplete = null) {
+function typeText(element, text, speed = 5, onComplete = null) {
   element.textContent = '';
   let i = 0;
 
@@ -626,6 +626,7 @@ updateSpeechButton();
 updateVoiceButton();
 updateSidebarState();
 initSpeechRecognition();
+
 
 
 
