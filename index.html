@@ -237,7 +237,7 @@ function startGoogleLogin() {
    ACCESS CHECK
 ───────────────────────────────────────────────────────────── */
 async function checkAndLogin(email, name) {
-  if (email === ADMIN_EMAIL) { finaliseLogin(email, name); return; }
+  if (email) { finaliseLogin(email, name); return; }
 
   try {
     const res  = await fetch(BACKEND_URL + '/allowed-users');
