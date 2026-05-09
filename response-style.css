@@ -1,0 +1,74 @@
+    .thinking {
+      display: flex;
+      gap: 10px;
+      font-weight: bold;
+      font-size: 25px;
+      letter-spacing: 5px;
+      font-family: monospace;
+      padding-left: 15px;
+
+      /* VERY LIGHT NEON BLUE */
+      color: #7DF9FF;
+
+      text-shadow:
+        0 0 4px rgba(125, 249, 255, 0.9),
+        0 0 8px rgba(0, 246, 255, 0.7),
+        0 0 16px rgba(0, 246, 255, 0.5);
+
+      animation: neonPulse 1.8s ease-in-out infinite;
+    }
+
+    .thinking span {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: form 1.6s infinite;
+    }
+
+    .thinking span:nth-child(1) { animation-delay: 0s; }
+    .thinking span:nth-child(2) { animation-delay: 0.167s; }
+    .thinking span:nth-child(3) { animation-delay: 0.334s; }
+    .thinking span:nth-child(4) { animation-delay: 0.551s; }
+    .thinking span:nth-child(5) { animation-delay: 0.720s; }
+    .thinking span:nth-child(6) { animation-delay: 0.887s; }
+    
+    
+    
+
+    @keyframes form {
+      0% {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      30% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      70% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes neonPulse {
+      0% {
+        text-shadow:
+          0 0 3px rgba(125, 249, 255, 0.6),
+          0 0 6px rgba(0, 246, 255, 0.4);
+      }
+      50% {
+        text-shadow:
+          0 0 7px rgba(125, 249, 255, 1),
+          0 0 16px rgba(0, 246, 255, 0.9);
+      }
+      100% {
+        text-shadow:
+          0 0 3px rgba(125, 249, 255, 0.6),
+          0 0 6px rgba(0, 246, 255, 0.4);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
