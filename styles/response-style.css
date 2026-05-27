@@ -1,0 +1,31 @@
+/* response-style.css — thinking orbs override (legacy compat) */
+
+.thinking {
+  display: flex;
+  align-items: center;
+  padding: 8px 0 4px;
+  min-height: 36px;
+}
+
+.thinking-orbs {
+  position: relative;
+  width: 64px; height: 28px;
+  display: flex; align-items: center;
+}
+
+.thinking-orbs .orb {
+  position: absolute; border-radius: 50%;
+  background: #00eaff;
+  box-shadow: 0 0 8px #00eaff, 0 0 16px rgba(0,234,255,0.4);
+}
+
+.thinking-orbs::after {
+  content: '';
+  position: absolute; left: 4px; right: 4px; top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, #00eaff, #a855f7, #00eaff);
+  opacity: 0.18; transform: translateY(-50%);
+  animation: arcPulse 1.6s ease-in-out infinite;
+}
+
+.hidden { display: none; }
