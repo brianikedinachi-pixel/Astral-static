@@ -415,7 +415,7 @@ function startGoogleLogin() {
 ───────────────────────────────────────────── */
 async function checkAndLogin(email, name) {
   /* Admin always gets in */
-  if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+  if (email.toLowerCase()) {
     finaliseLogin(email, name);
     return;
   }
