@@ -1008,7 +1008,7 @@ body.convo-mode .empty-state { padding-bottom: 24px; }
 .empty-state.hidden { display: none; }
 
 /* Stars */
-.es-stars { position: absolute; inset: 0; }
+.es-stars { position: absolute; inset: 0;margin-top:60px; }
 .es-star {
   position: absolute; border-radius: 50%;
   background: #00eaff;
