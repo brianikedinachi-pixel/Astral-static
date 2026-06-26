@@ -1700,9 +1700,8 @@ function _injectEmptyState() {
       <span class="es-star"></span><span class="es-star"></span>
       <span class="es-star"></span><span class="es-star"></span>
     </div>
-    <div class="es-body" style="margin-top:60px;">
+    <div class="es-body" style="margin-top:30px;">
       <div class="es-logo-wrap">
-        <img class="es-logo" src="img/logo.jpg" alt="Astral">
         <div class="es-glow"></div>
       </div>
       <div class="es-greeting" id="es-greeting">Hey there 👋</div>
