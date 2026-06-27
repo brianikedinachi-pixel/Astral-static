@@ -1,4 +1,4 @@
-const CACHE_NAME = 'astral-v8-pwa';
+const CACHE_NAME = 'astral-v10-pwa';
 // Caches that must survive every SW activation (i.e. every deploy), not just the
 // current precache version. Must stay in sync with _FILLER_CACHE_NAME in brain.js —
 // that cache holds the one-time-generated "thinking" filler audio for convo mode;
