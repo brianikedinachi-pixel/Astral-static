@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.onrender.astral_static_97bf.twa",
+        "sha256_cert_fingerprints": ["A2:57:5F:B4:F0:5C:E2:AA:BD:AE:B0:B0:B7:AE:07:FA:5C:CB:27:E0:0C:B3:8A:B9:59:C5:DA:D1:33:1E:50:5A"]
+      }
+    }]
