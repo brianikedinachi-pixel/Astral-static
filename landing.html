@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- PWA / full-screen app (Android + iOS) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Astral">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="img/icon-512.png">
+
+  <meta name="theme-color" content="#0a0f1c">
+  <title>Astral – Your AI Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cyan:   #00e5ff;
+      --purple: #7c3aed;
+      --pink:   #ec4899;
+      --bg:     #05080f;
+      --surface:#0d1117;
+      --card:   #0f1923;
+      --text:   #e8f4ff;
+      --muted:  #5a7a9a;
+      --border: rgba(0,229,255,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Canvas background ── */
+    #bg-canvas {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+
+    /* ── Floating orbs ── */
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(80px);
+      pointer-events: none; z-index: 0; animation: drift 18s ease-in-out infinite alternate;
+    }
+    .orb1 { width:520px; height:520px; top:-120px; left:-100px;
+             background: radial-gradient(circle, rgba(0,229,255,.13), transparent 70%); }
+    .orb2 { width:440px; height:440px; bottom:-80px; right:-80px;
+             background: radial-gradient(circle, rgba(124,58,237,.14), transparent 70%);
+             animation-delay: -9s; }
+    .orb3 { width:300px; height:300px; top:45%; left:55%;
+             background: radial-gradient(circle, rgba(236,72,153,.09), transparent 70%);
+             animation-delay: -4s; animation-duration: 22s; }
+    @keyframes drift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(40px,30px) scale(1.06); }
+    }
+
+    /* ── Grid overlay ── */
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,229,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at 50% 30%, black 0%, transparent 70%);
+    }
+
+    /* ── Page container ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 620px; margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    /* ── Nav bar ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,8,15,.75);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      font-size: 1.2rem; font-weight: 900; letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-cta {
+      padding: 8px 22px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      border: none; border-radius: 50px; color: #050810;
+      font-size: .85rem; font-weight: 700; cursor: pointer;
+      text-decoration: none; transition: .2s;
+      font-family: inherit;
+    }
+    .nav-cta:hover { opacity: .85; transform: translateY(-1px); }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 7rem 0 3.5rem;
+    }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid rgba(0,229,255,.3);
+      border-radius: 50px; padding: 5px 16px;
+      font-size: .72rem; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--cyan);
+      margin-bottom: 2rem;
+      background: rgba(0,229,255,.05);
+    }
+    .eyebrow-dot { width:6px; height:6px; border-radius:50%;
+                   background: var(--cyan); animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot {
+      0%,100%{ box-shadow: 0 0 0 0 rgba(0,229,255,.5); }
+      50%     { box-shadow: 0 0 0 5px rgba(0,229,255,0); }
+    }
+
+    .hero-title {
+      font-size: clamp(3.5rem, 10vw, 6rem);
+      font-weight: 900; line-height: .95;
+      letter-spacing: -2px;
+      background: linear-gradient(145deg, #ffffff 0%, var(--cyan) 40%, var(--purple) 80%, var(--pink) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 40px rgba(0,229,255,.25));
+      animation: title-glow 4s ease-in-out infinite alternate;
+      margin-bottom: 1.4rem;
+    }
+    @keyframes title-glow {
+      from { filter: drop-shadow(0 0 20px rgba(0,229,255,.2)); }
+      to   { filter: drop-shadow(0 0 50px rgba(0,229,255,.45)); }
+    }
+
+    .hero-sub {
+      font-size: 1.1rem; line-height: 1.7; color: #8ab8d8;
+      max-width: 480px; margin: 0 auto 2.5rem;
+      font-weight: 400;
+    }
+    .hero-sub strong { color: var(--text); font-weight: 600; }
+
+    /* ── Stats strip ── */
+    .stats-row {
+      display: flex; justify-content: center; gap: 2rem;
+      margin-bottom: 3rem; flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-size: 1.5rem; font-weight: 800; color: var(--cyan);
+      display: block; margin-bottom: 2px;
+    }
+    .stat-lbl { font-size: .7rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+    /* ── CTA buttons ── */
+    .cta-area {
+      display: flex; flex-direction: column; gap: 12px;
+      max-width: 360px; margin: 0 auto 5rem;
+    }
+    .btn-primary {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 16px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      border: none; border-radius: 14px;
+      color: #05080f; font-size: 1rem; font-weight: 800;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+      transition: .2s; box-shadow: 0 0 30px rgba(0,229,255,.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,229,255,.45); }
+
+    .btn-outline {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 15px;
+      background: rgba(0,229,255,.05);
+      border: 1.5px solid rgba(0,229,255,.3);
+      border-radius: 14px;
+      color: var(--cyan); font-size: .95rem; font-weight: 600;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+      transition: .2s;
+    }
+    .btn-outline:hover { background: rgba(0,229,255,.1); border-color: var(--cyan); }
+
+    /* ── Section title ── */
+    .section-title {
+      text-align: center; margin-bottom: 2rem;
+    }
+    .section-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: 12px;
+    }
+    .section-title h2 {
+      font-size: 2rem; font-weight: 800; letter-spacing: -1px;
+    }
+    .section-title p { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+
+    /* ── Feature cards ── */
+    .features {
+      display: grid; grid-template-columns: 1fr; gap: 14px;
+      margin-bottom: 4rem;
+    }
+
+    .feat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 24px;
+      display: flex; gap: 18px; align-items: flex-start;
+      transition: .25s; position: relative; overflow: hidden;
+    }
+    .feat-card::before {
+      content: ''; position: absolute;
+      inset: 0; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(0,229,255,.04), transparent);
+      opacity: 0; transition: .3s;
+    }
+    .feat-card:hover { border-color: rgba(0,229,255,.35); transform: translateY(-2px); }
+    .feat-card:hover::before { opacity: 1; }
+
+    .feat-icon-wrap {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .feat-card.purple .feat-icon-wrap {
+      background: rgba(124,58,237,.1); border-color: rgba(124,58,237,.2);
+    }
+    .feat-card.pink .feat-icon-wrap {
+      background: rgba(236,72,153,.08); border-color: rgba(236,72,153,.2);
+    }
+
+    .feat-body { flex: 1; }
+    .feat-title {
+      font-size: 1rem; font-weight: 700; margin-bottom: 6px;
+      color: var(--text);
+    }
+    .feat-desc { color: #6a90b0; font-size: .875rem; line-height: 1.65; }
+
+    /* ── "How it works" strip ── */
+    .how-strip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 24px;
+      margin-bottom: 4rem;
+    }
+    .how-strip h3 {
+      font-size: 1rem; font-weight: 700; margin-bottom: 20px; color: var(--cyan);
+    }
+    .steps { display: flex; flex-direction: column; gap: 16px; }
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 800; color: #050810;
+    }
+    .step-text strong { font-size: .9rem; color: var(--text); }
+    .step-text p { font-size: .82rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Trust bar ── */
+    .trust-bar {
+      text-align: center; padding: 24px;
+      background: rgba(0,229,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 16px; margin-bottom: 3rem;
+    }
+    .trust-bar p { font-size: .82rem; color: var(--muted); line-height: 1.7; }
+    .trust-bar strong { color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; color: var(--muted); font-size: .75rem; line-height: 2;
+      border-top: 1px solid var(--border); padding-top: 24px;
+    }
+    footer a { color: var(--cyan); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Nav -->
+  <nav>
+    <span class="nav-brand">ASTRAL</span>
+    <a class="nav-cta" href="index.html">Sign In →</a>
+  </nav>
+
+  <div class="page">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        AI-Powered · Available 24/7 · No Judgment
+      </div>
+
+      <h1 class="hero-title">Astral</h1>
+
+      <p class="hero-sub">
+        A <strong>warm, intelligent companion</strong> for addiction recovery,
+        emotional wellbeing, and everyday guidance. Here whenever you need to talk.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-num">24/7</span>
+          <span class="stat-lbl">Always on</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">0%</span>
+          <span class="stat-lbl">Judgment</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">∞</span>
+          <span class="stat-lbl">Patience</span>
+        </div>
+      </div>
+
+      <div class="cta-area">
+        <a class="btn-primary" href="index.html">
+          Start Talking to Astral →
+        </a>
+        <a class="btn-outline" href="index.html">Sign In</a>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section>
+      <div class="section-title">
+        <div class="section-label">What Astral does</div>
+        <h2>Everything you need. Nothing you don't.</h2>
+        <p>Built for the moments that matter most.</p>
+      </div>
+
+      <div class="features">
+        <div class="feat-card">
+          <div class="feat-icon-wrap">⭐</div>
+          <div class="feat-body">
+            <div class="feat-title">Addiction Recovery Support</div>
+            <p class="feat-desc">Compassionate guidance for substances, gaming, social media, porn, gambling — any pattern you want to break. No lectures. No shame. Just honest support.</p>
+          </div>
+        </div>
+
+        <div class="feat-card purple">
+          <div class="feat-icon-wrap">💙</div>
+          <div class="feat-body">
+            <div class="feat-title">Emotional Wellbeing</div>
+            <p class="feat-desc">Navigate anxiety, low moods, loneliness, and self-worth. Astral listens first, and responds like a friend who actually understands.</p>
+          </div>
+        </div>
+
+        <div class="feat-card pink">
+          <div class="feat-icon-wrap">🧠</div>
+          <div class="feat-body">
+            <div class="feat-title">Everyday Problem Solving</div>
+            <p class="feat-desc">School, coding, relationships, big decisions — Astral handles it all with the same warmth and clarity it brings to harder conversations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <div class="how-strip">
+      <h3>How it works</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <strong>Sign in with your email</strong>
+            <p>Quick and private. No passwords to remember.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <strong>Tell Astral what's on your mind</strong>
+            <p>Text, images, or just a few words — there's no wrong way to start.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <strong>Get real, thoughtful responses</strong>
+            <p>Astral remembers your journey and grows with you over time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust bar -->
+    <div class="trust-bar">
+      <p>
+        <strong>Your conversations are private.</strong> Astral is a supportive companion —
+        not a replacement for professional help. If you're in crisis, please reach out to
+        a licensed professional or crisis line.
+      </p>
+    </div>
+
+    <footer>
+      Created by Nweze-Ukanwoko Brian Chiemerie<br>
+      Built with care · <a href="index.html">Sign In</a>
+    </footer>
+  </div>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .catch(e => console.warn("SW failed", e));
+      });
+    }
+  </script>
+</body>
+</html>
