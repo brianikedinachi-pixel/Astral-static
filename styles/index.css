@@ -774,6 +774,15 @@ main {
 .send-arrow { display: flex; }
 .send-stop  { display: none; }
 
+.chat-answer-button {
+  width: 42px;
+  min-width: 42px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .chat-answer-button.sending {
   background: linear-gradient(135deg, #7c3aed 0%, #00d9ff 100%);
   box-shadow: 0 0 20px rgba(124,58,237,0.5), 0 0 30px rgba(0,217,255,0.3);
