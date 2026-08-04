@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    window.__deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window.__deferredInstallPrompt = e;
+      if (window.__onInstallPromptReady) window.__onInstallPromptReady();
+    });
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- PWA / full-screen app (Android + iOS) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Astral">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="img/icon-512.png">
+
+  <meta name="theme-color" content="#0a0f1c">
+  <title>Astral – Your AI Companion for Emotional & Addiction Guidance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cyan:   #00e5ff;
+      --purple: #7c3aed;
+      --pink:   #ec4899;
+      --bg:     #05080f;
+      --surface:#0d1117;
+      --card:   #0f1923;
+      --text:   #e8f4ff;
+      --muted:  #5a7a9a;
+      --border: rgba(0,229,255,.14);
+      --err:    #ff4d6d;
+      --info:   #00e5ff;
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow-x: hidden;
+      padding: 1rem;
+    }
+
+    /* ── Orbs ── */
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(80px);
+      pointer-events: none; z-index: 0;
+      animation: drift 16s ease-in-out infinite alternate;
+    }
+    .orb1 { width:440px; height:440px; top:-160px; left:-120px;
+             background: radial-gradient(circle, rgba(0,229,255,.12), transparent 70%); }
+    .orb2 { width:380px; height:380px; bottom:-100px; right:-80px;
+             background: radial-gradient(circle, rgba(124,58,237,.14), transparent 70%);
+             animation-delay:-8s; }
+    @keyframes drift {
+      from { transform: translate(0,0); }
+      to   { transform: translate(30px,25px); }
+    }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,229,255,.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.022) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at 50% 40%, black 0%, transparent 65%);
+    }
+
+    /* ── Wrap ── */
+    .wrap {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 400px;
+      animation: fadeUp .7s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Brand ── */
+    .brand { text-align: center; margin-bottom: 2rem; }
+    .logo {
+      font-size: 3.5rem; font-weight: 900; letter-spacing: -1px; line-height: 1;
+      background: linear-gradient(135deg, #fff 0%, var(--cyan) 45%, var(--purple) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 28px rgba(0,229,255,.3));
+      animation: glow 3s ease-in-out infinite alternate;
+      display: block; margin-bottom: 6px;
+    }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 14px rgba(0,229,255,.25)); }
+      to   { filter: drop-shadow(0 0 36px rgba(0,229,255,.55)); }
+    }
+    .tagline { color: #6a8faa; font-size: .88rem; font-style: italic; }
+
+    /* ── Card ── */
+    .card {
+      background: rgba(10,14,25,.9);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 2rem 1.8rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 60px rgba(0,229,255,.06), 0 20px 60px rgba(0,0,0,.4);
+    }
+    .card-title {
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--cyan); margin-bottom: 4px;
+    }
+    .card-sub {
+      color: var(--muted); font-size: .82rem; line-height: 1.55;
+      margin-bottom: 1.8rem;
+    }
+
+    /* ── Google button (COMMENTED OUT — see below) ── */
+    /*
+    .google-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
+      background: #fff; color: #1a1a1a;
+      border: none; border-radius: 12px;
+      padding: .9rem 1.2rem;
+      font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: .2s;
+      box-shadow: 0 2px 16px rgba(0,0,0,.35);
+      font-family: inherit;
+    }
+    .google-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+    .google-icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 1.4rem 0; color: var(--muted); font-size: .8rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(0,229,255,.12);
+    }
+    */
+
+    /* ── Loading ── */
+    .loading-row {
+      display: none; align-items: center; justify-content: center;
+      gap: 10px; padding: 12px 0;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(0,229,255,.18);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-txt { color: #8ab4cc; font-size: .88rem; }
+
+    /* ── Form ── */
+    .field { margin-bottom: 14px; }
+    label {
+      display: block; font-size: .75rem; font-weight: 600;
+      color: var(--muted); margin-bottom: 6px; letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    input[type=email], input[type=text], input[type=password] {
+      width: 100%;
+      padding: .82rem 1rem;
+      background: rgba(0,229,255,.045);
+      border: 1px solid rgba(0,229,255,.18);
+      border-radius: 11px;
+      color: var(--text); font-size: .95rem;
+      outline: none; transition: .2s;
+      font-family: inherit;
+      color-scheme: dark;
+    }
+    input:focus {
+      border-color: var(--cyan);
+      background: rgba(0,229,255,.07);
+      box-shadow: 0 0 0 3px rgba(0,229,255,.08);
+    }
+    input::placeholder { color: #3a5a78; }
+
+    /* Kill the light-mode autofill flash some browsers apply to inputs */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--text);
+      -webkit-box-shadow: 0 0 0 1000px #0d1520 inset;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+
+    /* Password show/hide toggle — same box styling, just a right-aligned eye */
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 2.6rem; }
+    .pw-toggle {
+      position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer; color: var(--muted);
+      transition: color .2s;
+    }
+    .pw-toggle:hover { color: var(--cyan); }
+    .pw-toggle svg { width: 18px; height: 18px; }
+
+    /* ── Verification code (OTP) boxes ── */
+    .otp-row { display: flex; gap: 8px; justify-content: space-between; margin-bottom: 6px; }
+    .otp-digit {
+      width: 100%; aspect-ratio: 1 / 1; text-align: center;
+      font-size: 1.3rem; font-weight: 700; letter-spacing: 0;
+      background: rgba(0,229,255,.045); border: 1px solid rgba(0,229,255,.18);
+      border-radius: 11px; color: var(--text); outline: none; transition: .2s;
+      font-family: inherit; color-scheme: dark;
+    }
+    .otp-digit:focus {
+      border-color: var(--cyan); background: rgba(0,229,255,.08);
+      box-shadow: 0 0 0 3px rgba(0,229,255,.1);
+    }
+    .otp-digit.filled { border-color: rgba(0,229,255,.4); }
+    .resend-row { text-align: center; font-size: .78rem; color: var(--muted); margin: -6px 0 14px; }
+    .resend-link { color: var(--cyan); cursor: pointer; text-decoration: underline; }
+    .resend-link.disabled { color: var(--muted); cursor: default; text-decoration: none; }
+
+    .btn-main {
+      width: 100%; padding: .9rem;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      border: none; border-radius: 12px;
+      color: #050810; font-size: .97rem; font-weight: 800;
+      cursor: pointer; transition: .2s; font-family: inherit;
+      margin-top: 4px;
+    }
+    .btn-main:hover { transform: translateY(-1px); box-shadow: 0 0 24px rgba(0,229,255,.35); }
+    .btn-main:active { transform: translateY(0); }
+
+    .btn-back {
+      width: 100%; padding: .7rem; margin-top: 10px;
+      background: transparent; border: 1px solid var(--border); border-radius: 12px;
+      color: var(--muted); font-size: .85rem; cursor: pointer; transition: .2s; font-family: inherit;
+    }
+    .btn-back:hover { color: var(--text); border-color: var(--cyan); }
+
+    .pw-strength {
+      display: flex; gap: 4px; margin: -6px 0 14px;
+    }
+    .pw-strength span {
+      flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.08); transition: background .2s;
+    }
+    .field-hint { font-size: .72rem; color: var(--muted); margin: -8px 0 14px; }
+
+    /* ── Messages ── */
+    .msg-box {
+      font-size: .8rem; padding: 10px 14px; border-radius: 10px;
+      margin-top: 12px; display: none; line-height: 1.5;
+    }
+    .msg-err  { background: rgba(255,77,109,.08); border: 1px solid rgba(255,77,109,.3); color: #ff8fa3; }
+    .msg-info { background: rgba(0,229,255,.07);  border: 1px solid rgba(0,229,255,.2);  color: var(--cyan); }
+    .denied-box {
+      display: none; text-align: center; padding: 1.2rem;
+      background: rgba(255,77,109,.06); border: 1px solid rgba(255,77,109,.25);
+      border-radius: 12px; margin-top: 14px;
+    }
+    .denied-box p { color: #ff8fa3; font-size: .85rem; line-height: 1.6; }
+
+    /* ── Footer bits ── */
+    .back-link {
+      display: block; text-align: center; margin-top: 1.2rem;
+      color: #3a5a70; font-size: .8rem; text-decoration: none; transition: .2s;
+    }
+    .back-link:hover { color: var(--cyan); }
+
+    /* ── Install ── */
+    .install-wrap { display: none; margin-top: 1rem; }
+    .install-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: transparent;
+      border: 1.5px solid rgba(0,229,255,.3); border-radius: 12px;
+      padding: .8rem 1.2rem; color: var(--cyan);
+      font-size: .88rem; font-weight: 600; cursor: pointer;
+      transition: .2s; font-family: inherit;
+    }
+    .install-btn:hover { background: rgba(0,229,255,.07); border-color: var(--cyan); }
+
+    footer {
+      text-align: center; margin-top: 1.6rem;
+      color: #2a4460; font-size: .73rem; line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="grid-overlay"></div>
+
+  <div class="wrap">
+
+    <div class="brand">
+      <span class="logo">Astral</span>
+      <p class="tagline">Support that never clocks out.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title">Sign in to Astral</p>
+      <p class="card-sub">Your chats are private and saved just for you.</p>
+
+      <!-- ╔══════════════════════════════════════════════════════════════╗
+           ║  GOOGLE SIGN-IN — commented out, do not delete             ║
+           ╚══════════════════════════════════════════════════════════════╝
+      <button type="button" class="google-btn" id="google-btn" onclick="startGoogleLogin()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="divider">or sign in manually</div>
+      -->
+
+      <!-- Loading row -->
+      <div class="loading-row" id="loading-row">
+        <div class="spinner"></div>
+        <span id="loading-txt">Checking access…</span>
+      </div>
+
+      <!-- Messages -->
+      <div class="msg-box msg-info" id="info-msg"></div>
+      <div class="msg-box msg-err"  id="err-msg"></div>
+      <div class="denied-box" id="denied-box">
+        <p>🔒 <strong style="color:#ff6b6b">Access Restricted</strong><br>
+        Your email hasn't been approved yet.<br>
+        Contact the admin to get access.</p>
+      </div>
+
+      <!-- STEP 1 — email only -->
+      <div id="step-email">
+        <div class="field">
+          <label for="email-in">Email Address</label>
+          <input type="email" id="email-in" placeholder="you@gmail.com" autocomplete="email">
+        </div>
+        <button type="button" class="btn-main" onclick="submitEmailStep()">Continue →</button>
+      </div>
+
+      <!-- STEP 2A — existing user: password only -->
+      <div id="step-signin" style="display:none">
+        <p class="card-sub" style="margin-bottom:16px" id="signin-email-label"></p>
+        <div class="field">
+          <label for="password-in">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="password-in" placeholder="Enter your password" autocomplete="current-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('password-in', this)" aria-label="Show password">👁</button>
+          </div>
+        </div>
+        <button type="button" class="btn-main" onclick="submitSignIn()">Sign In →</button>
+        <button type="button" class="btn-back" onclick="startForgotPassword()" style="margin-top:8px">Forgot password?</button>
+        <button type="button" class="btn-back" onclick="backToEmailStep()">← Use a different email</button>
+      </div>
+
+      <!-- STEP 2C — forgot password: request code -->
+      <div id="step-forgot" style="display:none">
+        <p class="card-sub" style="margin-bottom:16px" id="forgot-email-label"></p>
+        <p class="field-hint" style="margin-bottom:16px">We'll email a 6-digit code to verify it's you.</p>
+        <button type="button" class="btn-main" onclick="requestResetCode()">Send Reset Code →</button>
+        <button type="button" class="btn-back" onclick="backToEmailStep()">← Use a different email</button>
+      </div>
+
+      <!-- STEP 2D — forgot password: enter code + new password -->
+      <div id="step-reset" style="display:none">
+        <p class="card-sub" style="margin-bottom:16px">Enter the code we emailed you, and choose a new password.</p>
+        <div class="field">
+          <label for="reset-code-in">Reset Code</label>
+          <input type="text" id="reset-code-in" placeholder="6-digit code" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+        </div>
+        <div class="field">
+          <label for="reset-new-password-in">New Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="reset-new-password-in" placeholder="At least 8 characters" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('reset-new-password-in', this)" aria-label="Show password">👁</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="reset-confirm-password-in">Verify New Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="reset-confirm-password-in" placeholder="Re-enter your new password" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('reset-confirm-password-in', this)" aria-label="Show password">👁</button>
+          </div>
+        </div>
+        <button type="button" class="btn-main" onclick="submitPasswordReset()">Reset Password →</button>
+        <button type="button" class="btn-back" onclick="requestResetCode()">Resend code</button>
+        <button type="button" class="btn-back" onclick="backToEmailStep()">← Use a different email</button>
+      </div>
+
+      <!-- STEP 2E — new user: verify email with a code first -->
+      <div id="step-verify" style="display:none">
+        <p class="card-sub" style="margin-bottom:16px" id="verify-email-label"></p>
+        <p class="field-hint" style="margin-bottom:16px">We sent a 6-digit code to your email. Enter it below to continue.</p>
+        <div class="field">
+          <div class="otp-row" id="otp-row">
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-idx="0">
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-idx="1">
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-idx="2">
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-idx="3">
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-idx="4">
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-idx="5">
+          </div>
+        </div>
+        <div class="resend-row">Didn't get it? <span class="resend-link" id="resend-link" onclick="resendSignupCode()">Resend code</span></div>
+        <button type="button" class="btn-main" onclick="submitVerifyCode()">Verify Email →</button>
+        <button type="button" class="btn-back" onclick="backToEmailStep()">← Use a different email</button>
+      </div>
+
+      <!-- STEP 2B — new user: name + password + confirm (only after email verified) -->
+      <div id="step-signup" style="display:none">
+        <p class="card-sub" style="margin-bottom:16px" id="signup-email-label"></p>
+        <div class="field">
+          <label for="name-in">Your Name</label>
+          <input type="text" id="name-in" placeholder="e.g. Brian" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label for="new-password-in">Create a Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="new-password-in" placeholder="At least 8 characters" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('new-password-in', this)" aria-label="Show password">👁</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="confirm-password-in">Verify Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="confirm-password-in" placeholder="Re-enter your password" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('confirm-password-in', this)" aria-label="Show password">👁</button>
+          </div>
+        </div>
+        <button type="button" class="btn-main" onclick="submitSignUp()">Sign Up →</button>
+        <button type="button" class="btn-back" onclick="backToEmailStep()">← Use a different email</button>
+      </div>
+    </div>
+
+    <a class="back-link" href="landing.html">← Back to intro</a>
+
+    <div class="install-wrap" id="install-wrap">
+      <button class="install-btn" onclick="installApp()">
+        📲 Get the App
+      </button>
+    </div>
+
+    <footer>
+      Created by Nweze-Ukanwoko Brian Chiemerie<br>
+      Built with care for those who need support
+    </footer>
+  </div>
+
+<script>
+/* ─────────────────────────────────────────────
+   CONFIG
+───────────────────────────────────────────── */
+// const CLIENT_ID = '1082324111538-87784hv6i5ci5jam3cb8fe16v6tf4qbu.apps.googleusercontent.com'; // Google OAuth — kept for future use
+const ADMIN_EMAIL = 'bukanwoko@gmail.com';
+const BACKEND_URL = 'https://astral-1-sb1i.onrender.com';
+
+/* ─────────────────────────────────────────────
+   UI HELPERS
+───────────────────────────────────────────── */
+function showErr(msg) {
+  const e = document.getElementById('err-msg');
+  e.textContent = msg; e.style.display = 'block';
+}
+function showInfo(msg) {
+  const e = document.getElementById('info-msg');
+  e.textContent = msg; e.style.display = 'block';
+}
+function hideMessages() {
+  ['err-msg','info-msg','denied-box'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+function showLoading(txt) {
+  // document.getElementById('google-btn').style.display = 'none'; // Google btn hidden
+  document.getElementById('loading-row').style.display = 'flex';
+  if (txt) document.getElementById('loading-txt').textContent = txt;
+}
+function hideLoading() {
+  document.getElementById('loading-row').style.display = 'none';
+  // document.getElementById('google-btn').style.display = 'flex'; // Google btn hidden
+}
+
+/* ─────────────────────────────────────────────
+   SESSION — 7-day remembered session, validated
+   against the server so bans/expiry are honored
+   even on a device that stayed logged in.
+───────────────────────────────────────────── */
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function getCookie(name) {
+  const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
+function setCookie(name, value, maxAgeMs) {
+  const d = new Date(Date.now() + maxAgeMs);
+  document.cookie = name + '=' + encodeURIComponent(value) +
+    '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
+}
+function clearCookie(name) {
+  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+function clearSession() {
+  localStorage.removeItem('astral_session');
+  clearCookie('astral_session');
+}
+
+/* Already signed in? Verify the token with the server before bypassing
+   login — this is what makes a 7-day-old session still respect logouts,
+   expiry, and (critically) bans that happened after the last visit. */
+(async function checkExistingSession() {
+  let s = null;
+  try {
+    s = JSON.parse(localStorage.getItem('astral_session') || 'null');
+    if (!s || !s.email) {
+      const cv = getCookie('astral_session');
+      if (cv) s = JSON.parse(cv);
+    }
+  } catch(e) { s = null; }
+
+  if (!s || !s.email || !s.token) return; // nothing to restore — show login normally
+
+  // Locally-known expiry check first (avoids a network round trip once it's stale)
+  if (s.expires && Date.now() > s.expires) { clearSession(); return; }
+
+  try {
+    const res = await fetch(BACKEND_URL + '/session-check?token=' + encodeURIComponent(s.token));
+    if (!res.ok) { clearSession(); return; } // expired, invalid, or banned
+    const data = await res.json();
+    window.location.href = 'chat.html';
+  } catch(e) {
+    // Server unreachable — fall back to trusting the local session rather
+    // than locking the person out over a network blip.
+    window.location.href = 'chat.html';
+  }
+})();
+
+window.addEventListener('online', () => window.location.reload());
+
+/* ─────────────────────────────────────────────
+   GOOGLE SIGN-IN — commented out, kept for future re-enable
+   ─────────────────────────────────────────────
+   To re-enable:
+   1. Uncomment the google-btn HTML above
+   2. Uncomment the divider HTML above
+   3. Uncomment the showLoading/hideLoading google-btn lines
+   4. Uncomment these two functions below
+
+function startGoogleLogin() {
+  hideMessages();
+  showLoading('Redirecting to Google…');
+  const redirectUri = window.location.origin + window.location.pathname;
+  const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+  authUrl.searchParams.set('client_id',     CLIENT_ID);
+  authUrl.searchParams.set('redirect_uri',  redirectUri);
+  authUrl.searchParams.set('response_type', 'token');
+  authUrl.searchParams.set('scope',         'openid email profile');
+  authUrl.searchParams.set('prompt',        'select_account');
+  window.location.href = authUrl.toString();
+}
+
+(function handleGoogleReturn() {
+  const hash = window.location.hash;
+  if (!hash || !hash.includes('access_token')) return;
+  const params = {};
+  hash.replace(/^#/, '').split('&').forEach(pair => {
+    const [k, v] = pair.split('=');
+    params[decodeURIComponent(k)] = decodeURIComponent(v || '');
+  });
+  const token = params['access_token'];
+  if (!token) return;
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+  showLoading('Signing you in…');
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: 'Bearer ' + token }
+  })
+  .then(r => r.json())
+  .then(info => {
+    const email = (info.email || '').toLowerCase();
+    const name  = info.name || info.given_name || email.split('@')[0];
+    if (!email) { showErr('Could not read your Google email. Try manual sign-in.'); hideLoading(); return; }
+    checkAndLogin(email, name);
+  })
+  .catch(() => { showErr('Failed to get your Google profile. Try manual sign-in.'); hideLoading(); });
+})();
+*/
+
+/* ─────────────────────────────────────────────
+   ACCESS CHECK + FINALISE
+───────────────────────────────────────────── */
+function finaliseLogin(email, name, token) {
+  const users = JSON.parse(localStorage.getItem('astral_users') || '{}');
+  if (!users[email]) {
+    users[email] = { name, email, joinedAt: Date.now(), messageCount: 0, imageCount: 0 };
+  } else {
+    users[email].name = name;
+  }
+  localStorage.setItem('astral_users', JSON.stringify(users));
+  const sessionData = JSON.stringify({ email, name, token, expires: Date.now() + SESSION_TTL_MS });
+  localStorage.setItem('astral_session', sessionData);
+  setCookie('astral_session', sessionData, SESSION_TTL_MS);
+  const userId = 'u_' + btoa(email).replace(/[^a-z0-9]/gi, '').slice(0, 20);
+  localStorage.setItem('astral_user_id', userId);
+  window.location.href = 'chat.html';
+}
+
+/* ─────────────────────────────────────────────
+   PASSWORD SHOW/HIDE TOGGLE
+───────────────────────────────────────────── */
+function togglePw(id, btn) {
+  const input = document.getElementById(id);
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.textContent = showing ? '👁' : '🙈';
+  btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+}
+
+/* ─────────────────────────────────────────────
+   TWO-STEP SIGN IN / SIGN UP
+   Step 1: email only. We ask the server whether an
+   account exists for it, then branch:
+     - exists      → password field (sign in)
+     - doesn't     → name + new password + confirm (sign up)
+     - banned      → access denied, full stop
+───────────────────────────────────────────── */
+let _pendingEmail = '';
+
+function showStep(id) {
+  ['step-email','step-signin','step-signup','step-forgot','step-reset','step-verify'].forEach(s => {
+    document.getElementById(s).style.display = (s === id) ? 'block' : 'none';
+  });
+}
+
+function backToEmailStep() {
+  hideMessages();
+  _pendingEmail = '';
+  showStep('step-email');
+  setTimeout(() => document.getElementById('email-in').focus(), 50);
+}
+
+async function submitEmailStep() {
+  hideMessages();
+  const email = document.getElementById('email-in').value.trim().toLowerCase();
+  if (!email.includes('@')) { showErr('Enter a valid email address.'); return; }
+  showLoading('Checking your email…');
+  try {
+    const res  = await fetch(BACKEND_URL + '/account-exists?email=' + encodeURIComponent(email));
+    const data = await res.json();
+    hideLoading();
+    if (data.banned) {
+      document.getElementById('denied-box').style.display = 'block';
+      document.getElementById('denied-box').querySelector('p').innerHTML =
+        '🔒 <strong style="color:#ff6b6b">Access Restricted</strong><br>This account is no longer able to use Astral.';
+      return;
+    }
+    _pendingEmail = email;
+    if (data.exists) {
+      document.getElementById('signin-email-label').textContent = 'Signing in as ' + email;
+      showStep('step-signin');
+      setTimeout(() => document.getElementById('password-in').focus(), 50);
+    } else {
+      // New account — verify the email address before we let them set a password.
+      await sendSignupCode();
+    }
+  } catch(e) {
+    hideLoading();
+    showErr('Could not reach the server. Check your connection and try again.');
+  }
+}
+
+async function submitSignIn() {
+  hideMessages();
+  const password = document.getElementById('password-in').value;
+  if (!password) { showErr('Enter your password.'); return; }
+  showLoading('Signing you in…');
+  try {
+    const res  = await fetch(BACKEND_URL + '/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _pendingEmail, password })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (!res.ok) { showErr(data.detail || 'Sign in failed.'); return; }
+    finaliseLogin(data.email, data.name, data.token);
+  } catch(e) {
+    hideLoading();
+    showErr('Could not reach the server. Try again.');
+  }
+}
+
+/* ─────────────────────────────────────────────
+   EMAIL VERIFICATION (signup only) — a 6-digit
+   code must be confirmed before /signup will
+   accept a new account, so no one can create an
+   account with an email they don't control.
+───────────────────────────────────────────── */
+let _resendCooldownTimer = null;
+
+function otpDigits() {
+  return Array.from(document.querySelectorAll('#otp-row .otp-digit'));
+}
+function otpValue() {
+  return otpDigits().map(i => i.value).join('');
+}
+function clearOtp() {
+  otpDigits().forEach(i => { i.value = ''; i.classList.remove('filled'); });
+}
+function startResendCooldown(seconds) {
+  const link = document.getElementById('resend-link');
+  clearInterval(_resendCooldownTimer);
+  let remaining = seconds;
+  const tick = () => {
+    if (remaining <= 0) {
+      link.textContent = 'Resend code';
+      link.classList.remove('disabled');
+      clearInterval(_resendCooldownTimer);
+      return;
+    }
+    link.textContent = `Resend code (${remaining}s)`;
+    link.classList.add('disabled');
+    remaining--;
+  };
+  tick();
+  _resendCooldownTimer = setInterval(tick, 1000);
+}
+
+async function sendSignupCode() {
+  hideMessages();
+  showLoading('Sending verification code…');
+  try {
+    const res  = await fetch(BACKEND_URL + '/send-signup-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _pendingEmail })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (!res.ok) { showErr(data.detail || 'Could not send a verification code.'); return; }
+    document.getElementById('verify-email-label').textContent = 'Verifying ' + _pendingEmail;
+    clearOtp();
+    showStep('step-verify');
+    startResendCooldown(60);
+    setTimeout(() => otpDigits()[0].focus(), 50);
+  } catch(e) {
+    hideLoading();
+    showErr('Could not reach the server. Try again.');
+  }
+}
+
+async function resendSignupCode() {
+  if (document.getElementById('resend-link').classList.contains('disabled')) return;
+  await sendSignupCode();
+}
+
+async function submitVerifyCode() {
+  hideMessages();
+  const code = otpValue();
+  if (!/^\d{6}$/.test(code)) { showErr('Enter the 6-digit code from your email.'); return; }
+  showLoading('Verifying…');
+  try {
+    const res  = await fetch(BACKEND_URL + '/verify-signup-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _pendingEmail, code })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (!res.ok) { showErr(data.detail || 'Incorrect code.'); clearOtp(); otpDigits()[0].focus(); return; }
+    clearInterval(_resendCooldownTimer);
+    document.getElementById('signup-email-label').textContent = 'Creating an account for ' + _pendingEmail;
+    showStep('step-signup');
+    setTimeout(() => document.getElementById('name-in').focus(), 50);
+  } catch(e) {
+    hideLoading();
+    showErr('Could not reach the server. Try again.');
+  }
+}
+
+// Auto-advance / backspace / paste handling for the OTP boxes
+document.addEventListener('DOMContentLoaded', () => {
+  const digits = otpDigits();
+  digits.forEach((input, idx) => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '').slice(0, 1);
+      input.classList.toggle('filled', !!input.value);
+      if (input.value && idx < digits.length - 1) digits[idx + 1].focus();
+      if (otpValue().length === 6) submitVerifyCode();
+    });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !input.value && idx > 0) digits[idx - 1].focus();
+      if (e.key === 'Enter') submitVerifyCode();
+    });
+    input.addEventListener('paste', e => {
+      const text = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+      if (!text) return;
+      e.preventDefault();
+      text.split('').forEach((ch, i) => { if (digits[i]) { digits[i].value = ch; digits[i].classList.add('filled'); } });
+      const next = digits[Math.min(text.length, digits.length - 1)];
+      if (next) next.focus();
+      if (text.length === 6) submitVerifyCode();
+    });
+  });
+});
+
+async function submitSignUp() {
+  hideMessages();
+  const name     = document.getElementById('name-in').value.trim();
+  const pw       = document.getElementById('new-password-in').value;
+  const pwVerify = document.getElementById('confirm-password-in').value;
+  if (name.length < 1)      { showErr('Please enter your name.'); return; }
+  if (pw.length < 8)        { showErr('Password must be at least 8 characters.'); return; }
+  if (pw !== pwVerify)      { showErr('Passwords do not match.'); return; }
+  showLoading('Creating your account…');
+  try {
+    const res  = await fetch(BACKEND_URL + '/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _pendingEmail, name, password: pw })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (!res.ok) { showErr(data.detail || 'Sign up failed.'); return; }
+    finaliseLogin(data.email, data.name, data.token);
+  } catch(e) {
+    hideLoading();
+    showErr('Could not reach the server. Try again.');
+  }
+}
+
+document.getElementById('email-in').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitEmailStep();
+});
+document.getElementById('password-in').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitSignIn();
+});
+document.getElementById('confirm-password-in').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitSignUp();
+});
+
+/* ─────────────────────────────────────────────
+   FORGOT PASSWORD
+───────────────────────────────────────────── */
+function startForgotPassword() {
+  hideMessages();
+  document.getElementById('forgot-email-label').textContent = 'Reset password for ' + _pendingEmail;
+  showStep('step-forgot');
+}
+
+async function requestResetCode() {
+  hideMessages();
+  showLoading('Sending code…');
+  try {
+    const res = await fetch(BACKEND_URL + '/request-password-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _pendingEmail })
+    });
+    hideLoading();
+    if (!res.ok) { showErr('Could not send a reset code. Try again.'); return; }
+    showStep('step-reset');
+    showInfo('If an account exists for this email, a code has been sent — check your inbox.');
+    document.getElementById('reset-code-in').value = '';
+    setTimeout(() => document.getElementById('reset-code-in').focus(), 50);
+  } catch(e) {
+    hideLoading();
+    showErr('Could not reach the server. Try again.');
+  }
+}
+
+async function submitPasswordReset() {
+  hideMessages();
+  const code       = document.getElementById('reset-code-in').value.trim();
+  const pw         = document.getElementById('reset-new-password-in').value;
+  const pwVerify   = document.getElementById('reset-confirm-password-in').value;
+  if (!/^\d{6}$/.test(code))  { showErr('Enter the 6-digit code from your email.'); return; }
+  if (pw.length < 8)          { showErr('Password must be at least 8 characters.'); return; }
+  if (pw !== pwVerify)        { showErr('Passwords do not match.'); return; }
+  showLoading('Resetting your password…');
+  try {
+    const res  = await fetch(BACKEND_URL + '/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _pendingEmail, code, new_password: pw })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (!res.ok) { showErr(data.detail || 'Reset failed.'); return; }
+    showStep('step-signin');
+    document.getElementById('signin-email-label').textContent = 'Signing in as ' + _pendingEmail;
+    showInfo('Password reset ✓ — sign in with your new password.');
+  } catch(e) {
+    hideLoading();
+    showErr('Could not reach the server. Try again.');
+  }
+}
+
+document.getElementById('reset-code-in').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitPasswordReset();
+});
+
+/* ─────────────────────────────────────────────
+   PWA INSTALL
+───────────────────────────────────────────── */
+let deferredPrompt = null;
+
+window.__onInstallPromptReady = () => {
+  deferredPrompt = window.__deferredInstallPrompt;
+  document.getElementById('install-wrap').style.display = 'block';
+};
+if (window.__deferredInstallPrompt) window.__onInstallPromptReady();
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-wrap').style.display = 'block';
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then((choice) => {
+    deferredPrompt = null;
+    window.__deferredInstallPrompt = null;
+    if (choice.outcome === 'accepted') {
+      document.getElementById('install-wrap').style.display = 'none';
+    }
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-wrap').style.display = 'none';
+  deferredPrompt = null;
+  window.__deferredInstallPrompt = null;
+});
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
+        .then(r => r.update())
+        .catch(e => console.warn("SW failed", e));
+    });
+  }
+</script>
+</body>
+</html>
