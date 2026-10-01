@@ -363,8 +363,6 @@ main {
   color: #eaf4ff;
   max-width: 68%;
   padding: 11px 16px;
-  border-radius: 20px 20px 6px 20px;
-  border: 1px solid rgba(0,170,255,0.15);
   box-shadow: 0 2px 16px rgba(0,100,200,0.15), inset 0 1px 0 rgba(255,255,255,0.06);
   margin: 10px 20px 2px auto;
   font-size: 0.94rem;
